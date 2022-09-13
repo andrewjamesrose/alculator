@@ -1,1 +1,81 @@
 <p>table works!</p>
+
+<p>Aggregated table too?</p>
+
+<table mat-table [dataSource]="demoStatsTable" class="mat-elevation-z8" matSort >
+<!-- (matSortChange)="sortData($event)"> -->
+
+
+    <!-- Name-->
+    <!-- <ng-container matColumnDef="id">
+        <th mat-header-cell *matHeaderCellDef> ID </th>
+        <td mat-cell *matCellDef="let resultRow"> {{resultRow.id}} </td>
+    </ng-container> -->
+
+    <ng-container matColumnDef="date">
+        <th mat-header-cell *matHeaderCellDef> Date </th>
+        <td mat-cell *matCellDef="let resultRow"> {{resultRow.date}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="volume">
+        <th mat-header-cell *matHeaderCellDef> Volume (ml) </th>
+        <td mat-cell *matCellDef="let resultRow"> {{resultRow.volume}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="abv">
+        <th mat-header-cell *matHeaderCellDef> abv (%)</th>
+        <td mat-cell *matCellDef="let resultRow"> {{resultRow.abv| number : '1.1-1' }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="units_per">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Units </th>
+        <td mat-cell *matCellDef="let resultRow"> {{calculateUnits(resultRow)| number : '1.2-2' }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="quantity">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Quantity </th>
+        <td mat-cell *matCellDef="let resultRow"> {{resultRow.quantity}} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="units_total">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Total Units </th>
+        <td mat-cell *matCellDef="let resultRow"> {{calculateTotalUnits(resultRow)| number : '1.2-2' }} </td>
+    </ng-container>
+
+    <ng-container matColumnDef="edit">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Edit </th>
+        <td mat-cell *matCellDef="let resultRow">
+            <button mat-icon-button (click)="handleRowEdit(resultRow.id)">
+                <mat-icon>edit</mat-icon>
+            </button> 
+        </td>
+    </ng-container>
+
+    <ng-container matColumnDef="delete">
+        <th mat-header-cell *matHeaderCellDef mat-sort-header> Delete </th>
+        <td mat-cell *matCellDef="let resultRow">
+            <button mat-icon-button (click)="handleRowDelete(resultRow.id)">
+                <mat-icon class="material-symbols-outlined">delete</mat-icon>
+            </button> 
+
+        </td>
+    </ng-container>
+
+
+    <!-- <ng-container matColumnDef="total"> 
+        <th mat-header-cell *matHeaderCellDef> Total Games </th>
+      <td mat-cell *matCellDef="let resultRow"> {{totalGamesPlayed(resultRow.totals)}} </td>
+    </ng-container> -->
+
+    
+
+    <!-- tell the table which columns to include -->
+    <tr mat-header-row *matHeaderRowDef="columnFields"></tr>
+
+    <!-- tell the table which data in the row object to include
+        data will be shown iff
+            the key is a column name 
+        AND 
+            the key is present on the row object -->
+    <tr mat-row *matRowDef="let row; columns: columnFields;"></tr>
+  </table>
