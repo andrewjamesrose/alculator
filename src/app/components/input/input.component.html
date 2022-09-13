@@ -1,1 +1,21 @@
 <button mat-stroked-button color="accent">Test Button</button>
+
+<mat-form-field appearance="fill">
+    <mat-label>Choose a date</mat-label>
+    <input matInput [matDatepicker]="picker">
+    <mat-hint>dd/mm/yyyy</mat-hint>
+    <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+    <mat-datepicker #picker></mat-datepicker>
+</mat-form-field>
+
+<mat-form-field appearance="fill" floatLabel="always">
+    <mat-label>abv</mat-label>
+    <input matInput type="number" class="example-right-align" placeholder="0">
+    <span matSuffix>%</span>
+  </mat-form-field>
+
+  <mat-form-field appearance="fill" floatLabel="always">
+    <mat-label>Volume</mat-label>
+    <input matInput type="number" class="example-right-align" placeholder="0">
+    <span matSuffix>ml</span>
+  </mat-form-field>
