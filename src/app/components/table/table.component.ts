@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { CrudService } from 'src/app/services/crud.service';
 
 @Component({
   selector: 'app-table',
@@ -7,7 +8,7 @@ import { Component, OnInit } from '@angular/core';
 })
 export class TableComponent implements OnInit {
 
-  constructor() { }
+  constructor(private crudService: CrudService) { }
 
   columnFields: string[] = ['date', 'volume', 'abv', 'units_per', 'quantity', 'units_total', 'edit', 'delete']
 
@@ -64,7 +65,17 @@ export class TableComponent implements OnInit {
         console.log("Editing row: " + id)
     }
 
+    debug_WriteDemoData(): void {
+        this.crudService.admin_setDemoData()
+        
+    }
+
+    debug_ReadDemoData(): void {
+        this.crudService.admin_readBackFromDisk()
+    }
+
 }
+
 
 
 interface ResultRow {
