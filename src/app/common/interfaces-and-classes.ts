@@ -40,3 +40,20 @@ export class Bibation implements IBibation {
     }
     
 }
+
+
+export interface DrinkHistoryEntry {
+    id:         string,
+    date:       Date,
+    volume:     number,
+    abv:        number,
+    quantity:   number
+}
+
+
+export interface DrinkHistoryAggregation {
+    date: Date,
+    volume: number,
+    abv: number,
+    quantity: number
+}

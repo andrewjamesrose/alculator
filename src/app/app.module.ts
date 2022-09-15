@@ -12,6 +12,7 @@ import { MatInputModule } from '@angular/material/input'
 import {MatSelectModule} from '@angular/material/select';
 import {MatTableModule} from '@angular/material/table';
 import {MatIconModule} from '@angular/material/icon';
+import {MatRadioModule} from '@angular/material/radio'
 
 
 
@@ -45,7 +46,8 @@ import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material/core';
     MatInputModule,
     MatSelectModule,
     MatTableModule,
-    MatIconModule
+    MatIconModule,
+    MatRadioModule
 
   ],
   providers: [

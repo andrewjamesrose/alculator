@@ -2,11 +2,19 @@
 
 <p>Aggregated table too?</p>
 
-<button (click)="debug_WriteDemoData()" mat-stroked-button>Write Demo Data</button>
+<button (click)="debug_ResetDemoData()" mat-stroked-button>Reset Demo Data</button>
 <button (click)="debug_ReadDemoData()" mat-stroked-button>Read Demo Data</button>
 <button (click)="debug_PrintLocalTable()" mat-stroked-button>Print Data</button>
+<button (click)="test_dateArrayGenerator()" mat-stroked-button>Test</button>
+<button (click)="test_DateSerializer()" mat-stroked-button>Date Serialiser</button>
 
-<table mat-table [dataSource]="historyDetails" class="mat-elevation-z8" matSort >
+<mat-radio-group aria-label="Select an option" [formControl]="mode">
+    <mat-radio-button value="details">Details</mat-radio-button>
+    <mat-radio-button value="aggregate">Daily Summary</mat-radio-button>
+  </mat-radio-group>
+
+
+<table mat-table [dataSource]="historyDetails" class="mat-elevation-z8" matSort  *ngIf="mode.value=='details'"  >
 <!-- (matSortChange)="sortData($event)"> -->
 
 
@@ -18,7 +26,7 @@
 
     <ng-container matColumnDef="date">
         <th mat-header-cell *matHeaderCellDef> Date </th>
-        <td mat-cell *matCellDef="let resultRow"> {{resultRow.date}} </td>
+        <td mat-cell *matCellDef="let resultRow"> {{resultRow.date | date:'dd-MMM-YY' }} </td>
     </ng-container>
 
     <ng-container matColumnDef="volume">
@@ -74,12 +82,71 @@
     
 
     <!-- tell the table which columns to include -->
-    <tr mat-header-row *matHeaderRowDef="columnFields"></tr>
+    <tr mat-header-row *matHeaderRowDef="detailColumnFields"></tr>
 
     <!-- tell the table which data in the row object to include
         data will be shown iff
             the key is a column name 
         AND 
             the key is present on the row object -->
-    <tr mat-row *matRowDef="let row; columns: columnFields;"></tr>
+    <tr mat-row *matRowDef="let row; columns: detailColumnFields;"></tr>
   </table>
+
+
+
+  <table mat-table [dataSource]="historyAggregate" class="mat-elevation-z8" matSort  *ngIf="mode.value=='aggregate'" >
+    <!-- (matSortChange)="sortData($event)"> -->
+    
+    
+        <!-- Name-->
+        <!-- <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef> ID </th>
+            <td mat-cell *matCellDef="let resultRow"> {{resultRow.id}} </td>
+        </ng-container> -->
+    
+        <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef> Date </th>
+            <td mat-cell *matCellDef="let resultRow">
+
+            </td>
+        </ng-container>
+    
+        <ng-container matColumnDef="units_total">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Total Units </th>
+            <td mat-cell *matCellDef="let resultRow">
+
+            </td>
+        </ng-container>
+    
+        <ng-container matColumnDef="prev_week">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Rolling 1wk Total </th>
+            <td mat-cell *matCellDef="let resultRow">
+
+            </td>
+        </ng-container>
+    
+        <ng-container matColumnDef="other_stats">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Other Stats </th>
+            <td mat-cell *matCellDef="let resultRow">
+                
+            </td>
+        </ng-container>
+    
+    
+        <!-- <ng-container matColumnDef="total"> 
+            <th mat-header-cell *matHeaderCellDef> Total Games </th>
+          <td mat-cell *matCellDef="let resultRow"> {{totalGamesPlayed(resultRow.totals)}} </td>
+        </ng-container> -->
+    
+        
+    
+        <!-- tell the table which columns to include -->
+        <tr mat-header-row *matHeaderRowDef="aggregateColumnFields"></tr>
+    
+        <!-- tell the table which data in the row object to include
+            data will be shown iff
+                the key is a column name 
+            AND 
+                the key is present on the row object -->
+        <tr mat-row *matRowDef="let row; columns: aggregateColumnFields;"></tr>
+      </table>
