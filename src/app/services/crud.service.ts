@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { LocalStorageService } from './local-storage.service';
 
 @Injectable({
@@ -6,7 +7,8 @@ import { LocalStorageService } from './local-storage.service';
 })
 export class CrudService {
 
-  drinkHistory: object[]
+  private _drinkHistory: object[]
+  private drinkHistory$: BehaviorSubject<object[]> 
 
   constructor(private localStorage: LocalStorageService) {
     if(localStorage.getData('alculator_history') === null || localStorage.getData('alculator_history') === ''){
@@ -15,7 +17,9 @@ export class CrudService {
 
     }
 
-    this.drinkHistory = JSON.parse(localStorage.getData('alculator_history'))
+    this._drinkHistory = JSON.parse(localStorage.getData('alculator_history'))
+
+    this.drinkHistory$ = new BehaviorSubject(this._drinkHistory)
   }
 
     private readLocalStorage(): void{
@@ -24,19 +28,33 @@ export class CrudService {
 
         } 
         
-        this.drinkHistory = JSON.parse(this.localStorage.getData('alculator_history'))
+        this._drinkHistory = JSON.parse(this.localStorage.getData('alculator_history'))
     }
+
 
     private writeToLocalStorage(): void{
-        this.localStorage.saveData('alculator_history', JSON.stringify(this.drinkHistory))
+        this.localStorage.saveData('alculator_history', JSON.stringify(this._drinkHistory))
+
     }
+
+    
+    getHistoryDetailed(): Observable<object[]> {
+        return this.drinkHistory$.asObservable()
+    }
+
+
+    getHistoryAggregated(): object[] {
+        return []
+    }
+
 
     admin_getDataFromMemory(): object[] {
-        return this.drinkHistory
+        return this._drinkHistory
     }
 
+
     admin_setData(inputData: object[]): void {
-        this.drinkHistory = inputData
+        this._drinkHistory = inputData
         this.writeToLocalStorage()
         
     }
@@ -48,13 +66,15 @@ export class CrudService {
 
     admin_readBackFromDisk(): void {
         console.log("reading from disk to console:")
-        console.log(this.localStorage.getData('alculator_history'))
+        let tempObject = JSON.parse(this.localStorage.getData('alculator_history'))
+        // console.log(this.localStorage.getData('alculator_history'))
+        console.log(tempObject)
     }
 
 }
 
 
-const demoStatsTable = [
+const demoStatsTable: object[] = [
     {
         id:         123,
         date:       '06-Aug-22',

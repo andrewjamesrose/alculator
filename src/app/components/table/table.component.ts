@@ -8,44 +8,17 @@ import { CrudService } from 'src/app/services/crud.service';
 })
 export class TableComponent implements OnInit {
 
-  constructor(private crudService: CrudService) { }
-
-  columnFields: string[] = ['date', 'volume', 'abv', 'units_per', 'quantity', 'units_total', 'edit', 'delete']
-
-  
-  demoStatsTable = [
-    {
-        id:         123,
-        date:       '06-Aug-22',
-        volume:     440,
-        abv:        5,
-        quantity:   2
-    },
-    {
-        id:         234,
-        date:       '07-Aug-22',
-        volume:     250,
-        abv:        12,
-        quantity:   1
-    },
-    {
-        id:         345,
-        date:       '08-Aug-22',
-        volume:     568,
-        abv:        4.2,
-        quantity:   3
-    },
-    {
-        id:         456,
-        date:       '09-Aug-22',
-        volume:     50,
-        abv:        40,
-        quantity:   2
-    },
-  ]
-
-  ngOnInit(): void {
+  constructor(private crudService: CrudService) {
+    this.crudService.getHistoryDetailed().subscribe(historyDetails=>{this.historyDetails = historyDetails})
   }
+
+    historyDetails!: object[]
+
+    columnFields: string[] = ['date', 'volume', 'abv', 'units_per', 'quantity', 'units_total', 'edit', 'delete']
+
+
+    ngOnInit(): void {
+    }
 
     calculateUnits(row: ResultRow): number {
         return row.abv * row.volume / 1000
@@ -61,21 +34,26 @@ export class TableComponent implements OnInit {
         console.log("Deleting row: " + id)
     }
 
+
     handleRowEdit(id: number):void {
         console.log("Editing row: " + id)
     }
 
+
     debug_WriteDemoData(): void {
-        this.crudService.admin_setDemoData()
-        
+        this.crudService.admin_setDemoData()  
     }
+
 
     debug_ReadDemoData(): void {
         this.crudService.admin_readBackFromDisk()
     }
 
-}
+    debug_PrintLocalTable(): void {
+        console.log(this.historyDetails)
+    }
 
+}
 
 
 interface ResultRow {

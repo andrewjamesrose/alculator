@@ -2,10 +2,11 @@
 
 <p>Aggregated table too?</p>
 
-<button (click)="debug_WriteDemoData">Write Demo Data</button>
-<button (click)="debug_ReadDemoData">Read Demo Data</button>
+<button (click)="debug_WriteDemoData()" mat-stroked-button>Write Demo Data</button>
+<button (click)="debug_ReadDemoData()" mat-stroked-button>Read Demo Data</button>
+<button (click)="debug_PrintLocalTable()" mat-stroked-button>Print Data</button>
 
-<table mat-table [dataSource]="demoStatsTable" class="mat-elevation-z8" matSort >
+<table mat-table [dataSource]="historyDetails" class="mat-elevation-z8" matSort >
 <!-- (matSortChange)="sortData($event)"> -->
 
 
