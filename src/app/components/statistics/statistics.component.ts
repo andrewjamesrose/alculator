@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { CrudService } from 'src/app/services/crud.service';
 
 @Component({
   selector: 'app-statistics',
@@ -7,9 +8,13 @@ import { Component, OnInit } from '@angular/core';
 })
 export class StatisticsComponent implements OnInit {
 
-  constructor() { }
+  constructor(private crudService: CrudService) { 
+    this.mostRecent = this.crudService.mostRecentDrink()
+    this.daysSinceLast = this.crudService.daySinceLastDrink()
+  }
 
-    
+    mostRecent: Date
+    daysSinceLast: number
 
 
   ngOnInit(): void {

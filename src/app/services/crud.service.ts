@@ -107,6 +107,20 @@ export class CrudService {
     }
 
 
+    mostRecentDrink(): Date {
+        let maxDate = new Date(Math.max(...this._drinkHistory.map(item => item.date.getTime())))
+        return truncatedDate(maxDate)
+    }
+    
+
+    daySinceLastDrink(): number {
+        let now = truncatedDate(new Date())
+        let recent = this.mostRecentDrink()
+        return dateDiff(recent, now)
+    }
+
+
+
     admin_getDataFromMemory(): object[] {
         return this._drinkHistory
     }
@@ -278,5 +292,9 @@ function subtractNDays(date: Date, n_days: number): Date {
     let outputDate: Date = new Date(date);
     outputDate.setDate(outputDate.getDate()-n_days);
     return outputDate
+}
+
+function dateDiff(past: Date, future: Date): number {
+    return Math.round((future.getTime()-past.getTime())/(1000*60*60*24));
 }
   
