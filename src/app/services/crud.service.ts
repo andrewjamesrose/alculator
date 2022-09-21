@@ -251,20 +251,32 @@ function computeGraphData(inputData: IGraphData[]): void {
 
     // output = output.map(obj => ({...obj, rollingSum: 0}))
     
-    output = output.map(obj => ({...obj, rollingSum:  output.filter( (element) => {element.date <= obj.date && element.date >= subtractNDays(obj.date, 7) } )
-                                                                                .map(element => element.totalunits)
-                                                                                .reduce((runningTotal, totalUnits) => runningTotal + totalUnits, 0 ) }))
+    // output = output.map(obj => ({...obj, rollingSum:  output.filter( (element) => {element.date <= obj.date && element.date >= subtractNDays(obj.date, 7) } )
+    //                                                                             .map(element => element.totalunits)
+    //                                                                             .reduce((runningTotal, totalUnits) => runningTotal + totalUnits, 0 ) }))
+
+    let filteredArray = output.map(object => testMapFunction(object, output))
 
     // return output
-    console.log(output)
+    // console.log(output)
 
+}
+
+function testMapFunction(object: IGraphData, wholeList: IGraphData[]): void{
+    let currentDate = object.date
+    let pastDate = subtractNDays(object.date, 6)
+
+    let filteredList = wholeList.filter(element => element.date <= currentDate && element.date >=pastDate)
+    let outputValue = filteredList.map(element => element.totalunits).reduce((runningSumVal, currentVal) => runningSumVal + currentVal, 0)
+
+    console.log(filteredList)
+    console.log(outputValue)
 }
 
 
 function subtractNDays(date: Date, n_days: number): Date {
     let outputDate: Date = new Date(date);
     outputDate.setDate(outputDate.getDate()-n_days);
-    console.log(outputDate)
     return outputDate
 }
   
