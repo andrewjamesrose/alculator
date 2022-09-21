@@ -11,7 +11,8 @@
 <mat-radio-group aria-label="Select an option" [formControl]="mode">
     <mat-radio-button value="details">Details</mat-radio-button>
     <mat-radio-button value="aggregate">Daily Summary</mat-radio-button>
-  </mat-radio-group>
+    <mat-radio-button value="graph-data">Graph Data</mat-radio-button>
+</mat-radio-group>
 
 
 <table mat-table [dataSource]="historyDetails" class="mat-elevation-z8" matSort  *ngIf="mode.value=='details'"  >
@@ -94,7 +95,7 @@
 
 
 
-  <table mat-table [dataSource]="historyAggregate" class="mat-elevation-z8" matSort  *ngIf="mode.value=='aggregate'" >
+<table mat-table [dataSource]="historyAggregate" class="mat-elevation-z8" matSort  *ngIf="mode.value=='aggregate'" >
     <!-- (matSortChange)="sortData($event)"> -->
     
     
@@ -149,4 +150,62 @@
             AND 
                 the key is present on the row object -->
         <tr mat-row *matRowDef="let row; columns: aggregateColumnFields;"></tr>
-      </table>
+</table>
+
+
+<table mat-table [dataSource]="historyAggregate" class="mat-elevation-z8" matSort  *ngIf="mode.value=='graph-data'" >
+    <!-- (matSortChange)="sortData($event)"> -->
+    
+    
+        <!-- Name-->
+        <!-- <ng-container matColumnDef="id">
+            <th mat-header-cell *matHeaderCellDef> ID </th>
+            <td mat-cell *matCellDef="let resultRow"> {{resultRow.id}} </td>
+        </ng-container> -->
+    
+        <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef> Date </th>
+            <td mat-cell *matCellDef="let resultRow">
+
+            </td>
+        </ng-container>
+    
+        <ng-container matColumnDef="units_total">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Total Units </th>
+            <td mat-cell *matCellDef="let resultRow">
+
+            </td>
+        </ng-container>
+    
+        <ng-container matColumnDef="prev_week">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Rolling 1wk Total </th>
+            <td mat-cell *matCellDef="let resultRow">
+
+            </td>
+        </ng-container>
+    
+        <ng-container matColumnDef="other_stats">
+            <th mat-header-cell *matHeaderCellDef mat-sort-header> Other Stats </th>
+            <td mat-cell *matCellDef="let resultRow">
+                
+            </td>
+        </ng-container>
+    
+    
+        <!-- <ng-container matColumnDef="total"> 
+            <th mat-header-cell *matHeaderCellDef> Total Games </th>
+          <td mat-cell *matCellDef="let resultRow"> {{totalGamesPlayed(resultRow.totals)}} </td>
+        </ng-container> -->
+    
+        
+    
+        <!-- tell the table which columns to include -->
+        <tr mat-header-row *matHeaderRowDef="aggregateColumnFields"></tr>
+    
+        <!-- tell the table which data in the row object to include
+            data will be shown iff
+                the key is a column name 
+            AND 
+                the key is present on the row object -->
+        <tr mat-row *matRowDef="let row; columns: aggregateColumnFields;"></tr>
+</table>

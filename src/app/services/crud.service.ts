@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { DrinkHistoryAggregation, DrinkHistoryEntry } from '../common/interfaces-and-classes';
+import { GraphData, IDrinkHistoryAggregation, IDrinkHistoryEntry, IGraphData, IGraphDataWithSum } from '../common/interfaces-and-classes';
 import { LocalStorageService } from './local-storage.service';
 
 @Injectable({
@@ -8,8 +8,8 @@ import { LocalStorageService } from './local-storage.service';
 })
 export class CrudService {
 
-  private _drinkHistory: DrinkHistoryEntry[]
-  private drinkHistory$: BehaviorSubject<DrinkHistoryEntry[]> 
+  private _drinkHistory: IDrinkHistoryEntry[]
+  private drinkHistory$: BehaviorSubject<IDrinkHistoryEntry[]> 
 
   constructor(private localStorage: LocalStorageService) {
     if(localStorage.getData('alculator_history') === null || localStorage.getData('alculator_history') === ''){
@@ -39,12 +39,12 @@ export class CrudService {
     }
 
     
-    getHistoryDetailed(): Observable<DrinkHistoryEntry[]> {
+    getHistoryDetailed(): Observable<IDrinkHistoryEntry[]> {
         return this.drinkHistory$.asObservable()
     }
 
 
-    getHistoryAggregated(): DrinkHistoryAggregation[] {
+    getHistoryAggregated(): IDrinkHistoryAggregation[] {
         return []
     }
 
@@ -63,13 +63,56 @@ export class CrudService {
         this.drinkHistory$.next(this._drinkHistory)
     }
 
+    recalculateHistoryAggregation(): void {
+        // get a copy of the detailed list in memory
+
+        // for each list element, get the yyyy, mm, dd, 12,00,00 date
+            // create a date from this
+
+        // check if the date element already exists in the output object
+
+        // if not, create a new aggregation row
+
+        // 
+    }
+
+    
+    recalculateGraphData(): void {
+        // get a copy of the detailed list in memory
+
+        // find max date (with 12,00,00) 
+        let maxDate = new Date(Math.max(...this._drinkHistory.map(item => item.date.getTime())))
+        let minDate = new Date(Math.min(...this._drinkHistory.map(item => item.date.getTime())))
+        
+        //console.log(this._drinkHistory)
+
+        //truncate dates
+        maxDate = truncatedDate(maxDate)
+        minDate = truncatedDate(minDate)
+
+        let dateList: Date[] = getDates(minDate, maxDate)
+
+        // console.log(dateList)
+        let testList = dateList.map(date => new GraphData(date))
+
+
+        let newList: IGraphData[] = testList.map(obj => ({...obj, totalunits: Math.random() }))
+        // console.log(testList)
+
+        computeGraphData(newList)
+        // create a history list for each date between (and including) the min and max
+        
+
+        // merge with detailed list
+    }
+
 
     admin_getDataFromMemory(): object[] {
         return this._drinkHistory
     }
 
 
-    admin_setData(inputData: DrinkHistoryEntry[]): void {
+    admin_setData(inputData: IDrinkHistoryEntry[]): void {
         this._drinkHistory = inputData
         this.writeToLocalStorage()
         
@@ -112,7 +155,7 @@ function parseDate(ignored: any, value: any) {
 }
 
 
-const demoStatsTable: DrinkHistoryEntry[] = [
+const demoStatsTable: IDrinkHistoryEntry[] = [
     {
         id:         '716aec4c-2131-4a88-93de-1491be63f0d5',
         date:       new Date('2022-08-06T13:44:58.526Z'),
@@ -160,7 +203,6 @@ const demoStatsTable: DrinkHistoryEntry[] = [
         abv:        40,
         quantity:   1
     },
-
     {
         id:         '6ba14632-08d1-4375-a958-fc25fc673d08',
         // date:       '08-Aug-22',
@@ -169,7 +211,60 @@ const demoStatsTable: DrinkHistoryEntry[] = [
         abv:        4.2,
         quantity:   3
     },
+    {
+        id:         '6ba14632-08d1-4375-a958-fc25fc673d08',
+        // date:       '20-Aug-22',
+        date:       new Date('2022-08-20T10:41:58.526Z'),
+        volume:     568,
+        abv:        4.2,
+        quantity:   3
+    },
   ]
 
 
+
+ export function truncatedDate(longDate: Date): Date {
+    let outputDate: Date = new Date(longDate.getFullYear(), longDate.getMonth(), longDate.getDate())
+    return outputDate
+  }
+
+  function getDates(startDate: Date, endDate: Date): Date[] {
+    const dates: Date[] = []
+    let currentDate = startDate
+
+    function addDays(date: Date, days: number) {
+        var result = new Date(date);
+        result.setDate(result.getDate() + days);
+        return result;
+      }
+
+    while (currentDate <= endDate) {
+      dates.push(currentDate)
+      currentDate = addDays(currentDate, 1)
+    }
+
+    return dates
+}
+
+function computeGraphData(inputData: IGraphData[]): void {
+    let output = [... inputData]
+
+    // output = output.map(obj => ({...obj, rollingSum: 0}))
+    
+    output = output.map(obj => ({...obj, rollingSum:  output.filter( (element) => {element.date <= obj.date && element.date >= subtractNDays(obj.date, 7) } )
+                                                                                .map(element => element.totalunits)
+                                                                                .reduce((runningTotal, totalUnits) => runningTotal + totalUnits, 0 ) }))
+
+    // return output
+    console.log(output)
+
+}
+
+
+function subtractNDays(date: Date, n_days: number): Date {
+    let outputDate: Date = new Date(date);
+    outputDate.setDate(outputDate.getDate()-n_days);
+    console.log(outputDate)
+    return outputDate
+}
   

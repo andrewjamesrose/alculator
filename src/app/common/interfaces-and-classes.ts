@@ -42,7 +42,7 @@ export class Bibation implements IBibation {
 }
 
 
-export interface DrinkHistoryEntry {
+export interface IDrinkHistoryEntry {
     id:         string,
     date:       Date,
     volume:     number,
@@ -51,9 +51,37 @@ export interface DrinkHistoryEntry {
 }
 
 
-export interface DrinkHistoryAggregation {
+export interface IDrinkHistoryAggregation {
     date: Date,
     volume: number,
     abv: number,
     quantity: number
+}
+
+
+export interface IGraphData {
+    date: Date
+    totalunits: number
+}
+
+
+export class GraphData implements IGraphData {
+    date: Date
+    totalunits: number
+
+    constructor(date: Date){
+        this.date = date
+        this.totalunits = 0
+    }
+
+    addUnits(additionalUnits: number){
+        if(additionalUnits > 0){
+            this.totalunits = this.totalunits + additionalUnits
+        }
+    }
+}
+
+
+export interface IGraphDataWithSum extends IGraphData {
+    rollingSum: number
 }

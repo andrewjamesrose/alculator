@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { DrinkHistoryAggregation, DrinkHistoryEntry } from 'src/app/common/interfaces-and-classes';
+import { IDrinkHistoryAggregation, IDrinkHistoryEntry } from 'src/app/common/interfaces-and-classes';
 import { CrudService } from 'src/app/services/crud.service';
 
 @Component({
@@ -13,7 +13,7 @@ export class TableComponent implements OnInit {
   constructor(private crudService: CrudService) {
     this.crudService.getHistoryDetailed().subscribe(historyDetails=>{
         this.historyDetails = historyDetails
-        this.historyDetails.sort(function(element1: DrinkHistoryEntry, element2: DrinkHistoryEntry){
+        this.historyDetails.sort(function(element1: IDrinkHistoryEntry, element2: IDrinkHistoryEntry){
             // Turn your strings into dates, and then subtract them
             // to get a value that is either negative, positive, or zero.
             return -1 * (element1.date.valueOf() - element2.date.valueOf());
@@ -21,8 +21,9 @@ export class TableComponent implements OnInit {
     })
   }
 
-    historyDetails!: DrinkHistoryEntry[]
-    historyAggregate!: DrinkHistoryAggregation[]
+    historyDetails!: IDrinkHistoryEntry[]
+    historyAggregate!: IDrinkHistoryAggregation[]
+    graphData!: IDrinkHistoryAggregation[]
 
 
     detailColumnFields: string[] = ['date', 'volume', 'abv', 'units_per', 'quantity', 'units_total', 'edit', 'delete']
@@ -34,12 +35,12 @@ export class TableComponent implements OnInit {
     }
 
 
-    calculateUnits(row: DrinkHistoryEntry): number {
+    calculateUnits(row: IDrinkHistoryEntry): number {
         return row.abv * row.volume / 1000
     }
 
 
-    calculateTotalUnits(row: DrinkHistoryEntry): number {
+    calculateTotalUnits(row: IDrinkHistoryEntry): number {
         return row.quantity * this.calculateUnits(row)
     }
 
@@ -71,10 +72,11 @@ export class TableComponent implements OnInit {
 
     test_dateArrayGenerator(): void {
         //note that months are 0 indexed so 0=Jan etc
-        let start = new Date(2022, 8, 1)
-        let end = new Date(2022, 9, 14)
-        let returnValue = getDates(start, end)
-        console.log (returnValue)
+        // let start = new Date(2022, 8, 1)
+        // let end = new Date(2022, 9, 14)
+        // let returnValue = getDates(start, end)
+        // console.log (returnValue)
+        this.crudService.recalculateGraphData()
     }
 
     test_DateSerializer():void {
