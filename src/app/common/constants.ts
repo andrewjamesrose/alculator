@@ -1,3 +1,11 @@
+// https://www.nhs.uk/live-well/alcohol-advice/the-risks-of-drinking-too-much/#:~:text=men%20and%20women%20are%20advised,drink%2Dfree%20days%20each%20week
+
+export const MAX_7_DAY_TOTAL = 14
+
+export const MIN_SPREAD_DAYS = 3
+
+export const MAX_DAILY = MAX_7_DAY_TOTAL/MIN_SPREAD_DAYS
+
 export const DRINK_NAMED_VOLUMES = [
     {   displayString:  "Large Wine", 
         volume:         250

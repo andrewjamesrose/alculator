@@ -70,13 +70,19 @@ export class TableComponent implements OnInit {
     }
 
 
-    test_dateArrayGenerator(): void {
+    test_testFunction(): void {
         //note that months are 0 indexed so 0=Jan etc
         // let start = new Date(2022, 8, 1)
         // let end = new Date(2022, 9, 14)
         // let returnValue = getDates(start, end)
         // console.log (returnValue)
+        
+        
         this.crudService.recalculateGraphData()
+
+        // this.crudService.recalculateHistoryAggregation()
+
+        // calculateGraphAggregations
     }
 
     test_DateSerializer():void {

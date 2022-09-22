@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { GraphData, IDrinkHistoryAggregation, IDrinkHistoryEntry, IGraphData, IGraphDataWithSum } from '../common/interfaces-and-classes';
+import { BehaviorSubject, filter, Observable } from 'rxjs';
+import { GraphData, IDrinkHistoryAggregation, IDrinkHistoryEntry, IGraphData, IGraphDataWithSum as IGraphDataWithStats } from '../common/interfaces-and-classes';
 import { LocalStorageService } from './local-storage.service';
 
 @Injectable({
@@ -63,41 +63,19 @@ export class CrudService {
         this.drinkHistory$.next(this._drinkHistory)
     }
 
+
     recalculateHistoryAggregation(): void {
         // get a copy of the detailed list in memory
+        let data = [...this._drinkHistory]
 
-        // for each list element, get the yyyy, mm, dd, 12,00,00 date
-            // create a date from this
-
-        // check if the date element already exists in the output object
-
-        // if not, create a new aggregation row
-
-        // 
+        let myVar = calculateAggregations(data)
+        console.log(myVar) 
     }
 
     
     recalculateGraphData(): void {
-        // get a copy of the detailed list in memory
 
-        // find max date (with 12,00,00) 
-        let maxDate = new Date(Math.max(...this._drinkHistory.map(item => item.date.getTime())))
-        let minDate = new Date(Math.min(...this._drinkHistory.map(item => item.date.getTime())))
-        
-        //console.log(this._drinkHistory)
-
-        //truncate dates
-        maxDate = truncatedDate(maxDate)
-        minDate = truncatedDate(minDate)
-
-        let dateList: Date[] = getDates(minDate, maxDate)
-
-        // console.log(dateList)
-        let testList = dateList.map(date => new GraphData(date))
-
-
-        let newList: IGraphData[] = testList.map(obj => ({...obj, totalunits: Math.random() }))
-        // console.log(testList)
+        let newList = calculateGraphAggregations([...this._drinkHistory])
 
         computeGraphData(newList)
         // create a history list for each date between (and including) the min and max
@@ -111,7 +89,7 @@ export class CrudService {
         let maxDate = new Date(Math.max(...this._drinkHistory.map(item => item.date.getTime())))
         return truncatedDate(maxDate)
     }
-    
+
 
     daySinceLastDrink(): number {
         let now = truncatedDate(new Date())
@@ -269,22 +247,74 @@ function computeGraphData(inputData: IGraphData[]): void {
     //                                                                             .map(element => element.totalunits)
     //                                                                             .reduce((runningTotal, totalUnits) => runningTotal + totalUnits, 0 ) }))
 
-    let filteredArray = output.map(object => testMapFunction(object, output))
+    let localGraphData = output.map(object => calculateRollingSum(object, output, 6))
 
     // return output
-    // console.log(output)
+     console.log(localGraphData)
 
 }
 
-function testMapFunction(object: IGraphData, wholeList: IGraphData[]): void{
+function calculateRollingSum(object: IGraphData, wholeList: IGraphData[], sumWindow: number): IGraphDataWithStats {
     let currentDate = object.date
-    let pastDate = subtractNDays(object.date, 6)
+    let pastDate = subtractNDays(object.date, sumWindow)
 
     let filteredList = wholeList.filter(element => element.date <= currentDate && element.date >=pastDate)
-    let outputValue = filteredList.map(element => element.totalunits).reduce((runningSumVal, currentVal) => runningSumVal + currentVal, 0)
+    let outputValue = filteredList.map(element => element.totalunits).reduce((runningSumVal, currentVal) => runningSumVal + currentVal, 0)  
 
-    console.log(filteredList)
-    console.log(outputValue)
+    let output: IGraphDataWithStats = {...object, rollingSum: outputValue}
+
+    return output
+}
+
+
+function calculateAggregations(inputHistory: IDrinkHistoryEntry[]): IGraphData[] {
+    // note that dates must be serialised in order to be directly comparable
+    let uniqueDatesSet = new Set([...inputHistory.map(item=>truncatedDate(item.date).getTime())])
+    
+    let output: IGraphData[] = [...uniqueDatesSet].map(uniquedate => {
+                                                                let sumValue = inputHistory.filter(row=>truncatedDate(row.date).getTime()===uniquedate)
+                                                                                        .map(row => {
+                                                                                                let val = calculateTotalUnits(row) 
+                                                                                                return val
+                                                                                            }
+                                                                                        )
+                                                                                        .reduce((runningSumVal, currentVal) => runningSumVal + currentVal, 0)
+                                                                
+                                                                return new GraphData(new Date(uniquedate), sumValue)
+                                                            }
+                                            )
+
+    return output
+
+}
+
+function calculateGraphAggregations(inputHistory: IDrinkHistoryEntry[]): IGraphData[]{
+    let maxDate = new Date(Math.max(...inputHistory.map(item => item.date.getTime())))
+    let minDate = new Date(Math.min(...inputHistory.map(item => item.date.getTime())))
+    
+    //console.log(this._drinkHistory)
+
+    //truncate dates
+    maxDate = truncatedDate(maxDate)
+    minDate = truncatedDate(minDate)
+
+    let dateList: Date[] = getDates(minDate, maxDate)
+
+    let output: IGraphData[] = dateList.map(uniquedate => {
+                                                let sumValue = inputHistory.filter(row=>truncatedDate(row.date).getTime()===uniquedate.getTime())
+                                                                            .map(row => {
+                                                                                    let val = calculateTotalUnits(row) 
+                                                                                    return val
+                                                                                }
+                                                                            )
+                                                                            .reduce((runningSumVal, currentVal) => runningSumVal + currentVal, 0)
+        
+                                                return new GraphData(new Date(uniquedate), sumValue)
+                                            }
+                                        )
+
+    
+    return output
 }
 
 
@@ -297,4 +327,13 @@ function subtractNDays(date: Date, n_days: number): Date {
 function dateDiff(past: Date, future: Date): number {
     return Math.round((future.getTime()-past.getTime())/(1000*60*60*24));
 }
-  
+
+function calculateUnits(row: IDrinkHistoryEntry): number {
+    return row.abv * row.volume / 1000
+}
+
+
+function calculateTotalUnits(row: IDrinkHistoryEntry): number {
+    return row.quantity * calculateUnits(row)
+}
+

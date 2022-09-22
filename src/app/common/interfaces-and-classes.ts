@@ -69,9 +69,9 @@ export class GraphData implements IGraphData {
     date: Date
     totalunits: number
 
-    constructor(date: Date){
+    constructor(date: Date, totalUnits: number){
         this.date = date
-        this.totalunits = 0
+        this.totalunits = totalUnits
     }
 
     addUnits(additionalUnits: number){
