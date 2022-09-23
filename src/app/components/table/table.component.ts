@@ -19,6 +19,17 @@ export class TableComponent implements OnInit {
             return -1 * (element1.date.valueOf() - element2.date.valueOf());
           });
     })
+
+    this.crudService.getHistoryAggregation().subscribe(historyAggregation => {
+            console.log('received new history aggregation')
+            console.log(historyAggregation)
+    })
+
+    this.crudService.getGraphAggregation().subscribe(graphAggregation => {
+        console.log('received new graph aggregation')
+        console.log(graphAggregation)      
+    })
+
   }
 
     historyDetails!: IDrinkHistoryEntry[]

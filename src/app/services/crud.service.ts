@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, filter, Observable } from 'rxjs';
-import { GraphData, IDrinkHistoryAggregation, IDrinkHistoryEntry, IGraphData, IGraphDataWithSum as IGraphDataWithStats } from '../common/interfaces-and-classes';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { GraphData, IDrinkHistoryEntry, IGraphData, IGraphDataWithSum } from '../common/interfaces-and-classes';
 import { LocalStorageService } from './local-storage.service';
 
 @Injectable({
@@ -11,6 +11,14 @@ export class CrudService {
   private _drinkHistory: IDrinkHistoryEntry[]
   private drinkHistory$: BehaviorSubject<IDrinkHistoryEntry[]> 
 
+  private _historyAggregation: IGraphData[]
+  private historyAggregation$: BehaviorSubject<IGraphData[]>
+
+  private _graphAggregation: IGraphDataWithSum[]
+  private graphAggregation$: BehaviorSubject<IGraphDataWithSum[]>
+
+
+
   constructor(private localStorage: LocalStorageService) {
     if(localStorage.getData('alculator_history') === null || localStorage.getData('alculator_history') === ''){
         console.log("creating new blank object")
@@ -19,8 +27,23 @@ export class CrudService {
     }
 
     this._drinkHistory = JSON.parse(localStorage.getData('alculator_history'), parseDate)
-
     this.drinkHistory$ = new BehaviorSubject(this._drinkHistory)
+
+    this._historyAggregation = this.recalculateHistoryAggregation()
+    this.historyAggregation$ = new BehaviorSubject(this._historyAggregation)
+
+    this._graphAggregation = this.recalculateGraphData()
+    this.graphAggregation$ = new BehaviorSubject(this._graphAggregation)
+
+
+    this.drinkHistory$.subscribe( updatedHistory => {
+        // recalculate the aggregated table
+        this.reCalculateAggregations()
+
+        // recalculate the chart data
+
+        this.reBroadcastAggregations()
+    })
   }
 
     private readLocalStorage(): void{
@@ -44,8 +67,13 @@ export class CrudService {
     }
 
 
-    getHistoryAggregated(): IDrinkHistoryAggregation[] {
-        return []
+    getHistoryAggregation(): Observable<IGraphData[]> {
+        return this.historyAggregation$.asObservable()
+    }
+
+
+    getGraphAggregation(): Observable<IGraphDataWithSum[]> {
+        return this.graphAggregation$.asObservable()
     }
 
 
@@ -64,24 +92,30 @@ export class CrudService {
     }
 
 
-    recalculateHistoryAggregation(): void {
+    recalculateHistoryAggregation(): IGraphData[] {
         // get a copy of the detailed list in memory
         let data = [...this._drinkHistory]
-
-        let myVar = calculateAggregations(data)
-        console.log(myVar) 
+        
+        // calculate and return data
+        return calculateAggregations(data)
     }
 
     
-    recalculateGraphData(): void {
-
+    recalculateGraphData(): IGraphDataWithSum[] {
         let newList = calculateGraphAggregations([...this._drinkHistory])
+        return computeGraphData(newList)
+    }
 
-        computeGraphData(newList)
-        // create a history list for each date between (and including) the min and max
-        
 
-        // merge with detailed list
+    reCalculateAggregations(): void {
+        this._historyAggregation = this.recalculateHistoryAggregation()
+        this._graphAggregation = this.recalculateGraphData()
+    }
+
+
+    reBroadcastAggregations(): void {
+        this.historyAggregation$.next(this._historyAggregation)
+        this.graphAggregation$.next(this._graphAggregation)
     }
 
 
@@ -204,7 +238,7 @@ const demoStatsTable: IDrinkHistoryEntry[] = [
         quantity:   3
     },
     {
-        id:         '6ba14632-08d1-4375-a958-fc25fc673d08',
+        id:         '6ba14632-08d1-4375-a9j8-fc25fc673d08',
         // date:       '20-Aug-22',
         date:       new Date('2022-08-20T10:41:58.526Z'),
         volume:     568,
@@ -238,30 +272,23 @@ const demoStatsTable: IDrinkHistoryEntry[] = [
     return dates
 }
 
-function computeGraphData(inputData: IGraphData[]): void {
+function computeGraphData(inputData: IGraphData[]): IGraphDataWithSum[] {
     let output = [... inputData]
 
-    // output = output.map(obj => ({...obj, rollingSum: 0}))
+    let computedOutput = output.map(object => calculateRollingSum(object, output, 6))
     
-    // output = output.map(obj => ({...obj, rollingSum:  output.filter( (element) => {element.date <= obj.date && element.date >= subtractNDays(obj.date, 7) } )
-    //                                                                             .map(element => element.totalunits)
-    //                                                                             .reduce((runningTotal, totalUnits) => runningTotal + totalUnits, 0 ) }))
-
-    let localGraphData = output.map(object => calculateRollingSum(object, output, 6))
-
-    // return output
-     console.log(localGraphData)
+    return computedOutput
 
 }
 
-function calculateRollingSum(object: IGraphData, wholeList: IGraphData[], sumWindow: number): IGraphDataWithStats {
+function calculateRollingSum(object: IGraphData, wholeList: IGraphData[], sumWindow: number): IGraphDataWithSum {
     let currentDate = object.date
     let pastDate = subtractNDays(object.date, sumWindow)
 
     let filteredList = wholeList.filter(element => element.date <= currentDate && element.date >=pastDate)
     let outputValue = filteredList.map(element => element.totalunits).reduce((runningSumVal, currentVal) => runningSumVal + currentVal, 0)  
 
-    let output: IGraphDataWithStats = {...object, rollingSum: outputValue}
+    let output: IGraphDataWithSum = {...object, rollingSum: outputValue}
 
     return output
 }
