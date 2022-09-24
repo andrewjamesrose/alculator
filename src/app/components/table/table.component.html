@@ -97,63 +97,35 @@
 
 <table mat-table [dataSource]="historyAggregate" class="mat-elevation-z8" matSort  *ngIf="mode.value=='aggregate'" >
     <!-- (matSortChange)="sortData($event)"> -->
-    
-    
-        <!-- Name-->
-        <!-- <ng-container matColumnDef="id">
-            <th mat-header-cell *matHeaderCellDef> ID </th>
-            <td mat-cell *matCellDef="let resultRow"> {{resultRow.id}} </td>
-        </ng-container> -->
-    
+
         <ng-container matColumnDef="date">
             <th mat-header-cell *matHeaderCellDef> Date </th>
             <td mat-cell *matCellDef="let resultRow">
-
+                {{resultRow.date | date:'dd-MMM-YY' }}
             </td>
         </ng-container>
     
-        <ng-container matColumnDef="units_total">
+        <ng-container matColumnDef="totalunits">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Total Units </th>
             <td mat-cell *matCellDef="let resultRow">
+                {{resultRow.totalunits| number : '1.2-2'}}
+            </td>
+        </ng-container>
 
-            </td>
-        </ng-container>
-    
-        <ng-container matColumnDef="prev_week">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Rolling 1wk Total </th>
-            <td mat-cell *matCellDef="let resultRow">
-
-            </td>
-        </ng-container>
-    
-        <ng-container matColumnDef="other_stats">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Other Stats </th>
-            <td mat-cell *matCellDef="let resultRow">
-                
-            </td>
-        </ng-container>
-    
-    
-        <!-- <ng-container matColumnDef="total"> 
-            <th mat-header-cell *matHeaderCellDef> Total Games </th>
-          <td mat-cell *matCellDef="let resultRow"> {{totalGamesPlayed(resultRow.totals)}} </td>
-        </ng-container> -->
-    
-        
     
         <!-- tell the table which columns to include -->
-        <tr mat-header-row *matHeaderRowDef="aggregateColumnFields"></tr>
+        <tr mat-header-row *matHeaderRowDef="historyColumnFields"></tr>
     
         <!-- tell the table which data in the row object to include
             data will be shown iff
                 the key is a column name 
             AND 
                 the key is present on the row object -->
-        <tr mat-row *matRowDef="let row; columns: aggregateColumnFields;"></tr>
+        <tr mat-row *matRowDef="let row; columns: historyColumnFields;"></tr>
 </table>
 
 
-<table mat-table [dataSource]="historyAggregate" class="mat-elevation-z8" matSort  *ngIf="mode.value=='graph-data'" >
+<table mat-table [dataSource]="graphData" class="mat-elevation-z8" matSort  *ngIf="mode.value=='graph-data'" >
     <!-- (matSortChange)="sortData($event)"> -->
     
     
@@ -166,46 +138,31 @@
         <ng-container matColumnDef="date">
             <th mat-header-cell *matHeaderCellDef> Date </th>
             <td mat-cell *matCellDef="let resultRow">
-
+                {{resultRow.date | date:'dd-MMM-YY' }}
             </td>
         </ng-container>
     
-        <ng-container matColumnDef="units_total">
+        <ng-container matColumnDef="totalunits">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Total Units </th>
             <td mat-cell *matCellDef="let resultRow">
-
+                {{resultRow.totalunits| number : '1.2-2'}}
             </td>
         </ng-container>
     
-        <ng-container matColumnDef="prev_week">
+        <ng-container matColumnDef="rollingSum">
             <th mat-header-cell *matHeaderCellDef mat-sort-header> Rolling 1wk Total </th>
             <td mat-cell *matCellDef="let resultRow">
-
+                {{resultRow.rollingSum| number : '1.2-2'}}
             </td>
         </ng-container>
-    
-        <ng-container matColumnDef="other_stats">
-            <th mat-header-cell *matHeaderCellDef mat-sort-header> Other Stats </th>
-            <td mat-cell *matCellDef="let resultRow">
-                
-            </td>
-        </ng-container>
-    
-    
-        <!-- <ng-container matColumnDef="total"> 
-            <th mat-header-cell *matHeaderCellDef> Total Games </th>
-          <td mat-cell *matCellDef="let resultRow"> {{totalGamesPlayed(resultRow.totals)}} </td>
-        </ng-container> -->
-    
-        
     
         <!-- tell the table which columns to include -->
-        <tr mat-header-row *matHeaderRowDef="aggregateColumnFields"></tr>
+        <tr mat-header-row *matHeaderRowDef="graphColumnFields"></tr>
     
         <!-- tell the table which data in the row object to include
             data will be shown iff
                 the key is a column name 
             AND 
                 the key is present on the row object -->
-        <tr mat-row *matRowDef="let row; columns: aggregateColumnFields;"></tr>
+        <tr mat-row *matRowDef="let row; columns: graphColumnFields;"></tr>
 </table>

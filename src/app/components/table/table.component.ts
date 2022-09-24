@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { FormControl } from '@angular/forms';
-import { IDrinkHistoryAggregation, IDrinkHistoryEntry } from 'src/app/common/interfaces-and-classes';
+import { IDrinkHistoryAggregation, IDrinkHistoryEntry, IGraphData, IGraphDataWithSum } from 'src/app/common/interfaces-and-classes';
 import { CrudService } from 'src/app/services/crud.service';
 
 @Component({
@@ -23,22 +23,27 @@ export class TableComponent implements OnInit {
     this.crudService.getHistoryAggregation().subscribe(historyAggregation => {
             console.log('received new history aggregation')
             console.log(historyAggregation)
+            this.historyAggregate = historyAggregation
     })
 
     this.crudService.getGraphAggregation().subscribe(graphAggregation => {
         console.log('received new graph aggregation')
-        console.log(graphAggregation)      
+        console.log(graphAggregation)
+        this.graphData = graphAggregation  
     })
 
   }
 
     historyDetails!: IDrinkHistoryEntry[]
-    historyAggregate!: IDrinkHistoryAggregation[]
-    graphData!: IDrinkHistoryAggregation[]
+    historyAggregate!: IGraphData[]
+    graphData!: IGraphDataWithSum[]
 
 
     detailColumnFields: string[] = ['date', 'volume', 'abv', 'units_per', 'quantity', 'units_total', 'edit', 'delete']
     aggregateColumnFields: string[] = ['date', 'units_total', 'prev_week', 'other_stats']
+
+    historyColumnFields: string[] = ['date', 'totalunits']
+    graphColumnFields: string[] = ['date', 'totalunits', 'rollingSum']
 
     mode = new FormControl<string>('details') // 'details' or 'aggregate'
 
